@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+<head>
+  <title>UTSupply Stationery</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="uts.css">
+</head>
+<style>
+  table, th, td {
+    border: 1px solid whitesmoke;
+    border-collapse: collapse;
+    background-color: #E3E3E3;
+
+ }
+
+
+    th.thead{
+      padding-top: 6px;
+      padding-bottom: 6px;
+      text-align: left;
+      color: white;
+      background-color: #1B52AE;
+      color: white;
+      vertical-align: middle;
+    }
+
+
+
+</style>
+<body>
+<!-- TOP NAVIGATION - EMP -->
+
+<div class="topnav">
+  <a  href="managerLanding.html"  >Home</a>
+  <a href="managerAddProduct.html" > Add Products</a>
+  <a href="viewStock.html" class="active"> Stock Levels</a>
+  <a href="managerRequestView.html">Requests</a>
+  <a href="managerAutomaticOrderHistory.html">Automatic Orders</a>
+  <a href="index.html" class="logout">Logout</a>
+</div>
+
+
+<!-- end of top nav -->
+<div class="box">
+  <div class="header">
+    <img src="logo.png"  width="150px" height="150px "alt="logo" />
+  </div>
+
+  <!--Header image -->
+  <div id="login_div">
+    <h1 align="center">You are not signed in.</h1>
+    <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+  </div>
+  <div id="user_div">
+  <h1>UTSupply Stationery Products</h1>
+  <table id="productList" >
+    <tr>
+      <th class="thead">Product Name</th>
+      <th class="thead">Product Supplier</th>
+      <th class="thead">Amount Available</th>
+    </tr>
+  </table>
+  </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+
+</div>
+</div>
+  <img src="footer.png" alt="footer" class="footer">
+</body>
+<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+    authDomain: "utssupply-stationery.firebaseapp.com",
+    databaseURL: "https://utssupply-stationery.firebaseio.com",
+    projectId: "utssupply-stationery",
+    storageBucket: "",
+    messagingSenderId: "333420959904"
+  };
+  firebase.initializeApp(config);
+</script>
+<script>
+  ////////////////////////////////////////////////////
+  ///////////////IS USER SIGNED IN?///////////////////
+  ////////////////////////////////////////////////////
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      console.log(firebase.auth().currentUser);
+      // User is signed in.
+      document.getElementById("user_div").style.display = "block";
+      document.getElementById("user_div").style.display = "center";
+      document.getElementById("login_div").style.display = "none";
+    } else {
+      // No user is signed in.
+      document.getElementById("user_div").style.display = "none";
+      document.getElementById("login_div").style.display = "block";
+    }
+  });
+  /////////////////////////////////////////////////////
+  /////////////load Selection bar/////////////////////
+  /////////////////////////////////////////////////////
+  database = firebase.database();
+  const fb = firebase.database().ref();
+  var ref = database.ref('Products/');
+  ref.once('value', gotData, errData);
+
+  function gotData(data) {
+    console.log(data.val());
+    var Products = data.val();
+    var keys = Object.keys(Products);
+    console.log(keys);
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      var name = Products[k].productName;
+      var sup = Products[k].productSupplier;
+      var st = Products[k].inStock;
+      console.log(name);
+      console.log(sup);
+      console.log(st);
+      var table = document.getElementById("productList");
+      var row = document.createElement("tr");
+      var column1 = document.createElement("td");
+      column1.appendChild(document.createTextNode(name));
+      var column2 = document.createElement("td");
+      column2.appendChild(document.createTextNode(sup));
+      var column3 = document.createElement("td")
+      column3.appendChild(document.createTextNode(st));
+      row.appendChild(column1);
+      row.appendChild(column2);
+      row.appendChild(column3);
+      table.appendChild(row);
+    }
+  }
+
+
+  function errData(err) {
+    console.log('Error!');
+    console.log(err);
+
+  }
+</script>
+
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<!--
+Order Form
+employee must be logged in to access the form ( will find out how to do this in Javascript)
+maybe use the employee's name/number?? in a hidden field when the form is submitted
+-->
+<html>
+
+<head>
+  <title>Employee Order Form</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-database.js"></script>
+  <script>
+    src = "employeeCreateRequest.js"
+        </script>
+  <link rel="stylesheet" href="uts.css">
+</head>
+
+<body>
+<!-- TOP NAVIGATION - EMP -->
+
+<div class="topnav">
+  <a  href="employeeLanding.html"  >Home</a>
+  <a href="employeeCreateRequest.html" class="active" >Create a Request</a>
+  <a href="employeeRequestHistory.html" >Request History</a>
+  <a href="index.html" class="logout">Logout</a>
+</div>
+
+
+<!-- end of top nav -->
+
+<div class="box">
+  <div class="header">
+    <img src="logo.png"  width="150px" height="150px "alt="logo" />
+  </div>
+
+  <!--Header image -->
+
+  <div id="login_div">
+    <h1 align="center">You are not signed in.</h1>
+    <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+  </div>
+  <div id="user_div">
+  <h1>Request form</h1>
+  <table>
+    <td>
+
+      <table>
+    <td>
+      <tr>
+        <td>
+          <p>Product Name: </p>
+        </td>
+        <td>
+          <select id="pname" name="selection"></select>
+        </td>
+      </tr>
+    <td>
+      <p>Amount: </p>
+    </td>
+    <td>
+      <input type="number" id="amount" placeholder="amount..." />
+    </td>
+    
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+    <td>
+    </td>
+    <td>
+    <button onclick="add()">Complete Request</button>
+
+    </td>
+  </table>
+  </td>
+  </table>
+</div>
+</div>
+ <img src="footer.png" alt="footer" class="footer">
+</div>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+    authDomain: "utssupply-stationery.firebaseapp.com",
+    databaseURL: "https://utssupply-stationery.firebaseio.com",
+    projectId: "utssupply-stationery",
+    storageBucket: "",
+    messagingSenderId: "333420959904"
+  };
+  firebase.initializeApp(config);
+</script>
+<script>
+  ////////////////////////////////////////////////////
+  ///////////////IS USER SIGNED IN?///////////////////
+  ////////////////////////////////////////////////////
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      console.log(firebase.auth().currentUser);
+      // User is signed in.
+      document.getElementById("user_div").style.display = "block";
+      document.getElementById("user_div").style.display = "center";
+      document.getElementById("login_div").style.display = "none";
+    } else {
+      // No user is signed in.
+      document.getElementById("user_div").style.display = "none";
+      document.getElementById("login_div").style.display = "block";
+    }
+  });
+
+
+  ////////create all the selection options////////////
+  database = firebase.database();
+  var table = document.getElementById("output");
+  var row1 = document.createElement("tr");
+  var row2 = document.createElement("tr");
+  var row3 = document.createElement("tr");
+  var ref = database.ref('Products/');
+  var count = 1;
+  var request = [];
+  var fac;
+  var uname;
+  console.log(request);
+  var userUid;
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      userUid = user.uid;
+      var ref = database.ref('Users/employees');
+      console.log(ref);
+      ref.on('value', gotData, errData);
+
+      function gotData(data) {
+        //console.log(data.val());
+        var Users = data.val();
+        console.log(Users);
+        var keys = Object.keys(Users);
+        //console.log(keys);
+        for (var i = 0; i < keys.length; i++) {
+          var k = keys[i];
+          console.log(k);
+          var faculty = Users[k].faculty;
+          var name = Users[k].name;
+          console.log(faculty);
+          if (userUid == k) {
+            fac = faculty;
+            uname = name;
+            console.log(fac);
+            console.log(uname);
+          }
+        }
+      }
+    }
+  });
+
+  var ref = database.ref('Products/');
+  ref.on('value', gotData, errData);
+
+  function gotData(data) {
+    console.log(data.val());
+    var Products = data.val();
+    var keys = Object.keys(Products);
+    console.log(keys);
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      var name = Products[k].productName;
+      var sup = Products[k].productSupplier;
+      console.log(name);
+      console.log(sup);
+      var select = document.getElementById("pname");
+      var option = document.createElement("option");
+      option.appendChild(document.createTextNode(name + ' supplied by ' + sup));
+      select.appendChild(option);
+      console.log(request);
+    }
+  }
+
+  function errData(err) {
+    console.log('Error!');
+    console.log(err);
+  }
+
+  function add() {
+    console.log(request);
+    var strProduct = pname.options[pname.selectedIndex].value
+    var amount = document.getElementById("amount").value;
+    console.log(amount);
+    database = firebase.database();
+    var ref = database.ref('Products/');
+    ref.once('value', gotData, errData);
+
+    function gotData(data) {
+      console.log(data.val());
+      var Products = data.val();
+      var keys = Object.keys(Products);
+      console.log(keys);
+      console.log(request);
+      for (var i = 0; i < keys.length; i++) {
+        var productUid = keys[i];
+        var pname = Products[productUid].productName;
+        var sup = Products[productUid].productSupplier;
+        var stock = Products[productUid].inStock;
+        console.log("amount in stock: " + stock);
+        console.log("amount requested: " + amount);
+        var tester = (pname + " supplied by " + sup);
+        console.log(request);
+        if (strProduct == tester) {
+          console.log("if " + amount + "is less then or equal to " + stock);
+          if (Number(amount) <= Number(stock) && Number(amount) > 0) {
+            console.log(request);
+            //add2(pname, sup, amount);
+            console.log(request);
+            var status = "lodged";
+            request = {
+              userUid,
+              pname,
+              productUid,
+              uname,
+              amount,
+              status
+            };
+            console.log(request);
+            var selectobject = document.getElementById("pname")
+            for (var i = 0; i < selectobject.length; i++) {
+              if (selectobject.options[i].value == tester) {
+                selectobject.remove(i);
+              }
+            }
+            lodgeRequest();
+            ref = null;
+            return;
+          } else {
+            window.alert('Sorry there is not enough stock of that item for amount requested or the amount was a negative value')
+          }
+        }
+      }
+    }
+
+    function errData(err) {
+      console.log('Error!');
+      console.log(err);
+    }
+
+    function add2(name, sup, amount) {
+      row1.appendChild(document.createTextNode('Product: ' + name));
+      row2.appendChild(document.createTextNode('Supplier: ' + sup));
+      row3.appendChild(document.createTextNode('Amount requests: ' + amount));
+      table.appendChild(row1);
+      table.appendChild(row2);
+      table.appendChild(row3);
+      document.getElementById("complete").style.display = "block";
+    }
+  }
+
+  function lodgeRequest() {
+    const fb = firebase.database().ref();
+    console.log(request);
+    fb.child('Requests/' + fac).push(request);
+    removeStock();
+    request = [];
+    window.alert('request lodged');
+    location.reload();
+  }
+
+  function removeStock() {
+    ref.once('value', gotData, errData);
+
+    function gotData(data) {
+      console.log(data.val());
+      var Products = data.val();
+      var keys = Object.keys(Products);
+      console.log(keys);
+      for (var i = 0; i < keys.length; i++) {
+        var s = request.productUid;
+        console.log(s);
+        var reqamt = request.amount;
+        console.log(reqamt);
+        var k = keys[i];
+        console.log(k);
+        var amt = Products[k].inStock;
+        var productName = Products[k].productName;
+        var productDescription = Products[k].productDescription;
+        var productCategory = Products[k].productCategory;
+        var productSupplier = Products[k].productSupplier;
+        var productPrice = Products[k].productPrice;
+        console.log(amt);
+        var inStock = amt - reqamt;
+        console.log(inStock);
+        var data = {
+          productName,
+          productDescription,
+          productCategory,
+          productSupplier,
+          productPrice,
+          inStock
+        }
+        if (s == k) {
+          const fb = firebase.database().ref();
+          fb.child('Products/' + k).set(data);
+        }
+
+      }
+    }
+
+    function errData(err) {
+      console.log('Error!');
+      console.log(err);
+    }
+  }
+</script>
+</body>
+
+</html>

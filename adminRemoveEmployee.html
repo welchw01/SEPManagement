@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+<head>
+  <title>UTSupply Stationery - Remove Employee</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="uts.css">
+</head>
+
+<body>
+
+   <!-- TOP NAVIGATION???-->
+
+   <div class="topnav">
+            <a  href="adminLanding.html" >Home</a>
+            <div class="dropdown">
+              <button class="dropbutton" >Register </button>
+              <div class="dropdown_content">
+  <a href="adminRegisterEmployee.html" >Register Employee</a>
+   <a href="adminRegisterManager.html">Register Manager</a>
+   </div>
+</div>
+   <div class="dropdown">
+              <button class="dropbutton" >Edit </button>
+              <div class="dropdown_content">
+  <a href="adminEditEmployee.html">Edit Employee</a>
+   <a href="adminEditManager.html">Edit Manager</a>
+   </div>
+</div>
+<div class="dropdown">
+              <button class="dropbutton" id="active">Remove </button>
+              <div class="dropdown_content">
+  <a href="adminRemoveEmployee.html">Remove Employee</a>
+   <a href="adminRemoveManager.html">Remove Manager</a> 
+</div>
+</div>
+<a href="adminViewUser.html">View Users</a>
+  <a href="index.html" class="logout">Logout</a>
+</div>
+
+
+<!-- end of top nav -->
+
+        <div class="box">
+  <div class="header">
+  <img src="logo.png"  width="150px" height="150px "alt="logo" />
+</div>
+
+<!--Header image -->
+  <div id="login_div">
+    <h1 align="center">You are not signed in.</h1>
+    <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+  </div>
+  <div id="user_div">
+    <h1> Remove Employee</h1>
+    <p> Please select an Employee to delete or return to the Administrator Operations <a href="adminLanding.html">here</a></p>
+    <table>
+      <td>
+        <select id="userList" name="selection"></select>
+      </td>
+      <td>
+        <button id="removeBtn" onclick="removeUser()" type="submit">Remove selected Employee</button>
+      </td>
+    </table>
+  </div>
+  </div>
+  <img src="footer.png" alt="footer" class="footer">
+  <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+      authDomain: "utssupply-stationery.firebaseapp.com",
+      databaseURL: "https://utssupply-stationery.firebaseio.com",
+      projectId: "utssupply-stationery",
+      storageBucket: "",
+      messagingSenderId: "333420959904"
+    };
+    firebase.initializeApp(config);
+
+    var config = {
+      apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+      authDomain: "utssupply-stationery.firebaseapp.com",
+      databaseURL: "https://utssupply-stationery.firebaseio.com",
+      projectId: "utssupply-stationery",
+      storageBucket: "",
+      messagingSenderId: "333420959904"
+    };
+    var secondaryApp = firebase.initializeApp(config, "Secondary");
+  </script>
+  <script>
+    ////////////////////////////////////////////////////
+    ///////////////IS USER SIGNED IN?///////////////////
+    ////////////////////////////////////////////////////
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log(firebase.auth().currentUser);
+        // User is signed in.
+        document.getElementById("user_div").style.display = "block";
+        document.getElementById("user_div").style.display = "center";
+        document.getElementById("login_div").style.display = "none";
+      } else {
+        // No user is signed in.
+        document.getElementById("user_div").style.display = "none";
+        document.getElementById("login_div").style.display = "block";
+      }
+    });
+
+    database = firebase.database();
+    var ref = database.ref('Users/employees');
+    ref.once('value', gotData, errData);
+
+    function gotData(data) {
+      console.log(data.val());
+      var Users = data.val();
+      var keys = Object.keys(Users);
+      console.log(keys);
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        var name = Users[k].email;
+        console.log(name);
+        var select = document.getElementById("userList");
+        var option = document.createElement("option");
+        option.appendChild(document.createTextNode(name));
+        select.appendChild(option);
+        console.log(document.getElementById("userList"));
+      }
+    }
+
+    function errData(err) {
+      console.log('Error!');
+      console.log(err);
+
+    }
+
+    function removeUser() {
+      var fb = firebase.database().ref()
+      var selectionList = document.getElementById("userList");
+      var strUser = selectionList.options[selectionList.selectedIndex].value;
+      console.log("starting user deletion")
+      console.log(selectionList);
+      console.log(strUser);
+      ref.once('value', gotData, errData);
+
+      function gotData(data) {
+        //console.log(data.val());
+        var Users = data.val();
+        var keys = Object.keys(Users);
+        //console.log(keys);
+        for (var i = 0; i < keys.length; i++) {
+          console.log("currently in for loop: ");
+          console.log("outside if statment variables: ");
+          var k = keys[i];
+          console.log(k);
+          var email = Users[k].email;
+          var password = Users[k].password;
+          console.log(email);
+          if (email == strUser) {
+            console.log("if statement variables: ");
+            console.log(email);
+            console.log(k);
+            console.log("deleting: " + email);
+            fb.child('Users/employees/' + k + '/').remove()
+            secondaryApp.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+              // Handle Errors here.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              // ...
+            });
+            console.log('past the signin auth');
+          }
+        }
+      }
+
+      function errData(err) {
+        console.log('Error!');
+        console.log(err);
+      }
+    }
+
+    secondaryApp.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log(user);
+        window.alert(user.email + ' was deleted');
+        user.delete().then(function() {
+          // User deleted.
+          console.log(email + 'deleted');
+        }).catch(function(error) {
+          // An error happened.
+          console.log('deletion did not work');
+        });
+        location.reload();
+      } else {
+        console.log('no one in deletion auth');
+      }
+    });
+  </script>
+</body>
+
+</html>

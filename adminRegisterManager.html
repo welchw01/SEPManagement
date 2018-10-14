@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+    <head>
+        <title>Manager Account Registry</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="uts.css">
+        <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-auth.js"></script>
+        <script>
+            src = "login.js"
+        </script>
+    </head>
+
+    <body>
+
+        <!-- TOP NAVIGATION???-->
+
+        <div class="topnav">
+            <a  href="adminLanding.html" >Home</a>
+            <div class="dropdown">
+                <button class="dropbutton" id="active">Register </button>
+                <div class="dropdown_content">
+                    <a href="adminRegisterEmployee.html" >Register Employee</a>
+                    <a href="adminRegisterManager.html">Register Manager</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbutton" >Edit </button>
+                <div class="dropdown_content">
+                    <a href="adminEditEmployee.html">Edit Employee</a>
+                    <a href="adminEditManager.html">Edit Manager</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbutton">Remove </button>
+                <div class="dropdown_content">
+                    <a href="adminRemoveEmployee.html">Remove Employee</a>
+                    <a href="adminRemoveManager.html">Remove Manager</a> 
+                </div>
+            </div>
+            <a href="adminViewUser.html">View Users</a>
+            <a href="index.html" class="logout">Logout</a>
+        </div>
+
+
+        <!-- end of top nav -->
+
+        <div class="box">
+            <div class="header">
+                <img src="logo.png"  width="150px" height="150px "alt="logo" />
+            </div>
+
+            <!--Header image -->
+            <div id="login_div">
+                <h1 align="center">You are not signed in.</h1>
+                <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+            </div>
+            <div id="user_div">
+                <h1>Manager Account Registry</h1>
+                <table>
+                    <tr>
+                        <td>Name</td>
+                        <td><input type="text" id="registerName" title="name format" name="Name" placeholder="Full Name"></td>
+                    </tr>
+                    <tr>
+                        <td>Faculty</td>
+                        <td><select id="registerFaculty" name="faculty">
+                                <option value="FEIT">FEIT</option>
+                                <option value="FASS">FASS</option>
+                                <option value="DAB">DAB</option>
+                            </select></td>
+                    </tr>
+                    <tr>
+                        <td>Email </td>
+                        <td><input type="email" id="registerEmail" name="email" placeholder="Email"></td>
+                    </tr>
+                    <tr>
+                        <td>Password</td>
+                        <td><input type="password" id="registerPassword" name="password" placeholder="Password"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><button onClick="signUp()" type="submit" name="sign-up">Sign Up</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <img src="footer.png" alt="footer" class="footer">
+        <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+        <script>
+                            // Initialize Firebase
+                            var config = {
+                                apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+                                authDomain: "utssupply-stationery.firebaseapp.com",
+                                databaseURL: "https://utssupply-stationery.firebaseio.com",
+                                projectId: "utssupply-stationery",
+                                storageBucket: "",
+                                messagingSenderId: "333420959904"
+                            };
+                            firebase.initializeApp(config);
+
+                            var config = {
+                                apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+                                authDomain: "utssupply-stationery.firebaseapp.com",
+                                databaseURL: "https://utssupply-stationery.firebaseio.com",
+                                projectId: "utssupply-stationery",
+                                storageBucket: "",
+                                messagingSenderId: "333420959904"
+                            };
+                            var secondaryApp = firebase.initializeApp(config, "Secondary");
+        </script>
+        <script>
+            var namePatt = /^[a-zA-Z ]{1,70}$/;
+            ////////////////////////////////////////////////////
+            ///////////////IS USER SIGNED IN?///////////////////
+            ////////////////////////////////////////////////////
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    console.log(firebase.auth().currentUser);
+                    // User is signed in.
+                    document.getElementById("user_div").style.display = "block";
+                    document.getElementById("user_div").style.display = "center";
+                    document.getElementById("login_div").style.display = "none";
+                } else {
+                    // No user is signed in.
+                    document.getElementById("user_div").style.display = "none";
+                    document.getElementById("login_div").style.display = "block";
+                }
+            });
+
+            function signUp() {
+                email = document.getElementById('registerEmail').value;
+                password = document.getElementById('registerPassword').value;
+                name = document.getElementById('registerName').value;
+                if (namePatt.test(name)) {
+                    secondaryApp.auth().createUserWithEmailAndPassword(email, password)
+                            .catch(function (error) {
+                                // Handle Errors here.
+                                var errorCode = error.code;
+                                var errorMessage = error.message;
+                                if (errorCode == 'auth/weak-password') {
+                                    alert('The password is too weak.');
+                                } else {
+                                    alert(errorMessage);
+                                }
+                                console.log(error);
+                            });
+
+                    secondaryApp.auth().onAuthStateChanged(function (user) {
+                        if (user) {
+                            const fb = firebase.database().ref();
+                            //get field values
+                            email = document.getElementById('registerEmail').value;
+                            password = document.getElementById('registerPassword').value;
+                            name = document.getElementById('registerName').value;
+                            faculty = document.getElementById('registerFaculty').value;
+                            data = {
+                                email,
+                                password,
+                                name,
+                                faculty
+                            };
+
+                            //get new users unique id
+                            var newUser = secondaryApp.auth().currentUser;
+                            console.log(newUser);
+                            var uid = newUser.uid;
+                            console.log(uid);
+                            //var uid = secondaryApp.auth().currentUser.uid;
+                            //push into database
+                            fb.child('Users/managers/' + uid).set(data);
+                            alert('manager account for ' + name + ' created');
+                            secondaryApp.auth().signOut();
+                            
+                        } else {
+                            // No user is signed in.
+                            console.log('newuser reloaded');
+                        }
+                    });
+                } else {
+                    window.alert("Please enter a valid name")
+                }
+            }
+        </script>
+    </body>
+
+</html>

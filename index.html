@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>UTStationery Management System</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="uts.css">
+    </head>
+    <style type="text/css">
+        body {
+            background-image: linear-gradient( -135deg, #071628, #1B52AE);
+        }
+    </style>
+    <body>
+        <div class="box">
+  <div class="header">
+  <img src="logo.png"  width="150px" height="150px "alt="logo" />
+</div>
+        <h1>Welcome to the UTStationary Management System</h1>
+        <h2>Please select your Login Area (Employee, Manager or Admin)</h2>
+        </br>
+    </br>
+        <form>
+            <table>
+              <tr>
+                <button formaction="employeeLogin.html">Employee Login</button>
+              </tr>
+              <tr>
+                <button formaction="managerLogin.html">Manager Login</button>
+              </tr>
+              <tr>
+                <button formaction="adminLogin.html">Admin Login</button>
+              </tr>
+			</table>
+        </form>
+    </div>
+   <img src="footer.png" alt="footer" class="footer">
+        <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-database.js"></script>
+        <script>
+        // Initialize Firebase
+            var config = {
+            apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+            authDomain: "utssupply-stationery.firebaseapp.com",
+            databaseURL: "https://utssupply-stationery.firebaseio.com",
+            projectId: "utssupply-stationery",
+            storageBucket: "utssupply-stationery.appspot.com",
+            messagingSenderId: "333420959904"
+            };
+            firebase.initializeApp(config);
+        </script>
+        <script>
+        window.onLoad = test();
+function test(){
+        firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+    console.log('user signed out');
+    firebase.auth().signOut();
+  } else {
+    // No user is signed in.
+  }
+});
+}
+
+        function check(){
+        console.log('the script runs')
+        var user = firebase.auth().currentUser;
+        console.log(user);
+
+        if (user) {
+        // User is signed in.
+        console.log('user signed out');
+        firebase.auth().signOut();
+        } else {
+        // No user is signed in.
+        }
+      }
+        </script>
+    </body>
+</html>

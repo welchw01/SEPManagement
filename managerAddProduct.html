@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>UTSupply Stationery - Add Product</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-database.js"></script>
+        <link rel="stylesheet" href="uts.css">
+    </head>
+
+    <body>
+        <!-- TOP NAVIGATION - EMP -->
+
+        <div class="topnav">
+            <a  href="managerLanding.html"  >Home</a>
+            <a href="managerAddProduct.html" class="active"> Add Products</a>
+            <a href="viewStock.html" > Stock Levels</a>
+            <a href="managerRequestView.html">Requests</a>
+            <a href="managerAutomaticOrderHistory.html">Automatic Orders</a>
+            <a href="index.html" class="logout">Logout</a>
+        </div>
+
+
+        <!-- end of top nav -->
+        <div class="box">
+            <div class="header">
+                <img src="logo.png"  width="150px" height="150px "alt="logo" />
+            </div>
+
+            <!--Header image -->
+            <div id="login_div">
+                <h1 align="center">You are not signed in.</h1>
+                <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+            </div>
+            <div id="user_div">
+                <h1> Add Product </h1>
+                <h4>To add a product, fill the the required fields and press the submit button.</h4>
+                <table>
+                    <tr>
+                        <td>Product Name</td>
+                        <td><input id="productName" type="text" name="productName" placeholder="Name..."></td>
+                    </tr>
+                    <tr>
+                        <td>Description</td>
+                        <td><input id="productDescription" type="text" name="descrption" placeholder="Description..."></td>
+                    </tr>
+                    <tr>
+                        <td>Category</td>
+                        <td>
+                            <select id="productCategory">
+                                <option value="Pens/Pencils">Pens/Pencils</option>
+                                <option value="Paper">Paper</option>
+                                <option value="Envelopes">Envelopes</option>
+                                <option value="Printer">Printer</option>
+                                <option value="Filing and Storage">Filing and Storage</option>
+                                <option value="Stapling">Stapling</option>
+                                <option value="Notepads">Notepads</option>
+                                <option value="Diaries">Diaries</option>
+                                <option value="Erasers">Erasers</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Supplier</td>
+                        <td><input id="productSupplier" type="text" name="supplier" placeholder="Supplier..."></td>
+                    </tr>
+                    <tr>
+                        <td>Price</td>
+                        <td><input id="productPrice" type="number" min="0.00" max="10000.00" step="0.01" name="descrption" placeholder="Price..."></td>
+                    </tr>
+                    <tr>
+                        <td>inStock</td>
+                        <td><input id="inStock" type="number" name="description" placeholder="Stock..."></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><button onclick="addProduct()" id="btn-add-product" type="submit" name="add-product">Add Product</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <img src="footer.png" alt="footer" class="footer">
+        <script>
+            // Initialize Firebase
+            var config = {
+                apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+                authDomain: "utssupply-stationery.firebaseapp.com",
+                databaseURL: "https://utssupply-stationery.firebaseio.com",
+                projectId: "utssupply-stationery",
+                storageBucket: "",
+                messagingSenderId: "333420959904"
+            };
+            firebase.initializeApp(config);
+            database = firebase.database();
+        </script>
+         <script>
+  ////////////////////////////////////////////////////
+  ///////////////IS USER SIGNED IN?///////////////////
+  ////////////////////////////////////////////////////
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    console.log(firebase.auth().currentUser);
+    // User is signed in.
+    document.getElementById("user_div").style.display = "block";
+    document.getElementById("user_div").style.align = "center";
+    document.getElementById("login_div").style.display = "none";
+  } else {
+    // No user is signed in.
+    document.getElementById("user_div").style.display = "none";
+    document.getElementById("login_div").style.display = "block";
+  }
+  });
+
+            var namePatt = /^[a-zA-Z 0-9]{1,100}$/;
+            var supPatt = /^[a-zA-Z 0-9]{1,100}$/;
+            var priPatt = /^[0-9]*\.[0-9]{2}$/;
+            var stoPatt = /^[1-9][0-9]*$/;
+
+            function addProduct() {
+                //////get field values///////////
+                productName = document.getElementById('productName').value
+                productDescription = document.getElementById('productDescription').value
+                productCategory = document.getElementById('productCategory').value
+                productSupplier = document.getElementById('productSupplier').value
+                productPrice = document.getElementById('productPrice').value
+                inStock = document.getElementById('inStock').value
+
+
+                if (namePatt.test(productName)) {
+                        if (supPatt.test(productSupplier)) {
+                            if (priPatt.test(productPrice)) {
+                                if (stoPatt.test(inStock)) {
+                                    //testing input into database
+                                    const fb = firebase.database().ref();
+                                    var ref = firebase.database().ref("Products/");
+                                    ref.once('value', gotData, errData);
+
+                                    function gotData(data) {
+                                        console.log(data.val());
+                                        var products = data.val();
+                                        var keys = Object.keys(products);
+                                        console.log(keys);
+                                        for (var i = 0; i < keys.length; i++) {
+                                            var k = keys[i];
+                                            var name = products[k].productName;
+                                            var supplier = products[k].productSupplier;
+                                            console.log(name);
+                                            if (name.toLowerCase() == productName.toLowerCase() && supplier.toLowerCase() == productSupplier.toLowerCase()) {
+                                                window.alert("this product is already in catalogue");
+                                                return;
+                                            }
+                                        }
+                                        /////concatenate product information//////
+                                        data = {
+                                            productName,
+                                            productDescription,
+                                            productCategory,
+                                            productSupplier,
+                                            productPrice,
+                                            inStock
+                                        }
+                                        //push into database
+                                        fb.child('Products/').push(data)
+                                        window.alert(productName + "was added to the catalogue");
+                                    }
+
+                                    function errData(err) {
+                                        /////concatenate product information//////
+                                        data = {
+                                            productName,
+                                            productDescription,
+                                            productCategory,
+                                            productSupplier,
+                                            productPrice,
+                                            inStock
+                                        }
+                                        //push into database
+                                        fb.child('Products/').push(data)
+                                        window.alert(productName + "was added to the catalogue");
+
+                                    }
+                                } else {
+                                    //stock
+                                    window.alert('please enter a whole number above zero');
+                                }
+                            } else {
+                                //price
+                                window.alert('please enter a value that is to 2 decimal places');
+                            }
+                        } else {
+                            //supplier
+                            window.alert('please enter a valid supplier (less then 100 characters)');
+                        }                   
+                } else {
+                    //name
+                    window.alert('please enter a valid product name');
+                }
+            }
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+<head>
+  <title>UTSupply Stationery</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="uts.css">
+</head>
+
+<body>
+  <div id="login_div">
+    <h1 align="center">You are not signed in.</h1>
+    <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+  </div>
+  <div id="user_div">
+    <h1>UTSupply Stationery Automatic Invoices</h1>
+    <table id="invoiceList">
+      <tr>
+        <th>Product Name</th>
+        <th>Product Supplier</th>
+        <th>Amount Available when Ordered</th>
+        <th>Amount Ordered</th>
+      </tr>
+    </table>
+  </div>
+</body>
+<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+    authDomain: "utssupply-stationery.firebaseapp.com",
+    databaseURL: "https://utssupply-stationery.firebaseio.com",
+    projectId: "utssupply-stationery",
+    storageBucket: "",
+    messagingSenderId: "333420959904"
+  };
+  firebase.initializeApp(config);
+
+  ////////////////////////////////////////////////////
+  ///////////////IS USER SIGNED IN?///////////////////
+  ////////////////////////////////////////////////////
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      console.log(firebase.auth().currentUser);
+      // User is signed in.
+      document.getElementById("user_div").style.display = "block";
+      document.getElementById("user_div").style.display = "center";
+      document.getElementById("login_div").style.display = "none";
+    } else {
+      // No user is signed in.
+      document.getElementById("user_div").style.display = "none";
+      document.getElementById("login_div").style.display = "block";
+    }
+  });
+</script>
+<script>
+  /////////////////////////////////////////////////////
+  /////////////load Selection bar/////////////////////
+  /////////////////////////////////////////////////////
+  database = firebase.database();
+  var ref = database.ref('Invoices/');
+  ref.once('value', gotData, errData);
+
+  function gotData(data) {
+    console.log(data.val());
+    var Invoices = data.val();
+    var keys = Object.keys(Invoices);
+    console.log(keys);
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      var name = Invoices[k].name;
+      var sup = Invoices[k].sup;
+      var st = Invoices[k].st;
+      var ordered = 200;
+      console.log(name);
+      console.log(sup);
+      console.log(st);
+      console.log(ordered);
+      var table = document.getElementById("invoiceList");
+      var row = document.createElement("tr");
+      var column1 = document.createElement("td");
+      column1.appendChild(document.createTextNode(name));
+      var column2 = document.createElement("td");
+      column2.appendChild(document.createTextNode(sup));
+      var column3 = document.createElement("td")
+      column3.appendChild(document.createTextNode(st));
+      var column4 = document.createElement("td")
+      column4.appendChild(document.createTextNode(ordered));
+      row.appendChild(column1);
+      row.appendChild(column2);
+      row.appendChild(column3);
+      row.appendChild(column4);
+      table.appendChild(row);
+
+    }
+  }
+
+  function errData(err) {
+    console.log('Error!');
+    console.log(err);
+
+  }
+</script>
+
+</html>

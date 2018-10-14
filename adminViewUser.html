@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+<head>
+  <title>UTSupply Stationery - View User</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="uts.css">
+</head>
+
+<body>
+  <!-- TOP NAVIGATION???-->
+
+   <div class="topnav">
+            <a  href="adminLanding.html" >Home</a>
+            <div class="dropdown">
+              <button class="dropbutton" >Register </button>
+              <div class="dropdown_content">
+  <a href="adminRegisterEmployee.html" >Register Employee</a>
+   <a href="adminRegisterManager.html">Register Manager</a>
+   </div>
+</div>
+   <div class="dropdown">
+              <button class="dropbutton" >Edit </button>
+              <div class="dropdown_content">
+  <a href="adminEditEmployee.html">Edit Employee</a>
+   <a href="adminEditManager.html">Edit Manager</a>
+   </div>
+</div>
+<div class="dropdown">
+              <button class="dropbutton">Remove </button>
+              <div class="dropdown_content">
+  <a href="adminRemoveEmployee.html">Remove Employee</a>
+   <a href="adminRemoveManager.html">Remove Manager</a> 
+</div>
+</div>
+<a href="adminViewUser.html" class="active">View Users</a>
+  <a href="index.html" class="logout">Logout</a>
+</div>
+
+
+<!-- end of top nav -->
+
+        <div class="box">
+  <div class="header">
+  <img src="logo.png"  width="150px" height="150px "alt="logo" />
+</div>
+
+<!--Header image -->
+  <div id="login_div">
+    <h1 align="center">You are not signed in.</h1>
+    <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+  </div>
+  <div id="user_div">
+    <h1>View User</h1>
+    <p> Please select a User to view, or return to the Administrator Operations <a href="adminLanding.html">here</a></p>
+    <table>
+      <div class="selection">
+        <tr>
+          <td>
+            <select style="text-align:left" placeholder="Choose a user:" id="userList" name="selection"></select>
+          </td>
+          <td>
+            <button style="text-align:left" id="loadBtn" onclick="loadUser()" type="submit">Select User</button>
+          </td>
+        </tr>
+        <tr class="spacer"></tr>
+    </table>
+    <div style="clear:both;"></div>
+    <div style="clear:both;"></div>
+    <table id="output">
+      <th scope="column" colspan="3">Selected User</th>
+    </table>
+  </div>
+  </div>
+  </div>
+  </div>
+  <img src="footer.png" alt="footer" class="footer">
+  <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+      authDomain: "utssupply-stationery.firebaseapp.com",
+      databaseURL: "https://utssupply-stationery.firebaseio.com",
+      projectId: "utssupply-stationery",
+      storageBucket: "",
+      messagingSenderId: "333420959904"
+    };
+    firebase.initializeApp(config);
+
+    var config = {
+      apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+      authDomain: "utssupply-stationery.firebaseapp.com",
+      databaseURL: "https://utssupply-stationery.firebaseio.com",
+      projectId: "utssupply-stationery",
+      storageBucket: "",
+      messagingSenderId: "333420959904"
+    };
+    var secondaryApp = firebase.initializeApp(config, "Secondary");
+  </script>
+  <script>
+    ////////////////////////////////////////////////////
+    ///////////////IS USER SIGNED IN?///////////////////
+    ////////////////////////////////////////////////////
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log(firebase.auth().currentUser);
+        // User is signed in.
+        document.getElementById("user_div").style.display = "block";
+        document.getElementById("user_div").style.display = "center";
+        document.getElementById("login_div").style.display = "none";
+      } else {
+        // No user is signed in.
+        document.getElementById("user_div").style.display = "none";
+        document.getElementById("login_div").style.display = "block";
+      }
+    });
+
+
+    /////////////////////////////////////////////////////
+    /////////////load Selection bar/////////////////////
+    /////////////////////////////////////////////////////
+    database = firebase.database();
+    var managerRef = database.ref('Users/managers/');
+    var employeeRef = database.ref('Users/employees/')
+    employeeRef.once('value', gotData, errData);
+
+    function gotData(data) {
+      console.log(data.val());
+      var Users = data.val();
+      var keys = Object.keys(Users);
+      console.log(keys);
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        var name = Users[k].email;
+        console.log(name);
+        var select = document.getElementById("userList");
+        var option = document.createElement("option");
+        option.appendChild(document.createTextNode(name));
+        select.appendChild(option);
+        console.log(document.getElementById("userList"));
+      }
+    }
+
+    function errData(err) {
+      console.log('Error!');
+      console.log(err);
+
+    }
+
+    managerRef.once('value', gotOther, errOther);
+
+    function gotOther(data) {
+      console.log(data.val());
+      var Users = data.val();
+      var keys = Object.keys(Users);
+      console.log(keys);
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        var name = Users[k].email;
+        console.log(name);
+        var select = document.getElementById("userList");
+        var option = document.createElement("option");
+        option.appendChild(document.createTextNode(name));
+        select.appendChild(option);
+        console.log(document.getElementById("userList"));
+      }
+    }
+
+    function errOther(err) {
+      console.log('Error!');
+      console.log(err);
+
+    }
+
+    /////////////////////////////////////////////////////
+    /////////load Selected User's credentials///////////
+    ////////////and display them in a table/////////////
+    //TO DISPLAY CREDENTIALS FROM EMPLOYEE-BASED ACCOUNTS//
+    var table = document.getElementById("output");
+    var row1 = document.createElement("tr");
+    var row2 = document.createElement("tr");
+    var row3 = document.createElement("tr");
+    var row4 = document.createElement("tr");
+
+    function loadUser() {
+        row1.innerHTML = "";
+                row2.innerHTML = "";
+                row3.innerHTML = "";
+                row4.innerHTML = "";
+      var fb = firebase.database().ref()
+      var selectionList = document.getElementById("userList");
+      var strUser = selectionList.options[selectionList.selectedIndex].value;
+      console.log(strUser);
+      employeeRef.once('value', gotData, errData);
+
+      function gotData(data) {
+        //console.log(data.val());
+        var Users = data.val();
+        var keys = Object.keys(Users);
+        //console.log(keys);
+        for (var i = 0; i < keys.length; i++) {
+          var k = keys[i];
+          var email = Users[k].email;
+          var faculty = Users[k].faculty;
+          var name = Users[k].name;
+          var password = Users[k].password;
+          if (email == strUser) {
+            row1.appendChild(document.createTextNode("Email:  " + email));
+            row2.appendChild(document.createTextNode("Faculty:  " + faculty));
+            row3.appendChild(document.createTextNode("Full Name:  " + name));
+            row4.appendChild(document.createTextNode("Password:   " + password));
+            table.appendChild(row1);
+            table.appendChild(row2);
+            table.appendChild(row3);
+            table.appendChild(row4);
+          } else {}
+        }
+      }
+
+      //TO DISPLAY CREDENTIALS FROM MANAGER-BASED ACCOUNTS//
+      managerRef.once('value', gotData, errData);
+
+      function otherData(data) {
+        //console.log(data.val());
+        var Users = data.val();
+        var keys = Object.keys(Users);
+        //console.log(keys);
+        for (var i = 0; i < keys.length; i++) {
+          var k = keys[i];
+          var email = Users[k].email;
+          var faculty = Users[k].faculty;
+          var name = Users[k].name;
+          var password = Users[k].password;
+          if (email == strUser) {
+            row1.appendChild(document.createTextNode("Email:  " + email));
+            row2.appendChild(document.createTextNode("Faculty:  " + faculty));
+            row3.appendChild(document.createTextNode("Full Name:  " + name));
+            row4.appendChild(document.createTextNode("Password:   " + password));
+            table.appendChild(row1);
+            table.appendChild(row2);
+            table.appendChild(row3);
+            table.appendChild(row4);
+          } else {}
+        }
+      }
+
+    }
+
+    function reload() {
+      location.reload();
+    }
+  </script>
+</body>
+
+</html>

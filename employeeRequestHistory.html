@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!--
+Output all accepted requests
+heading - accepted
+nav - ul inside
+add li's to import
+heading - denied
+nav - ul inside
+add li's.
+look at box in request history
+ -->
+<html>
+
+<head>
+  <title>Request History</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="uts.css">
+</head>
+
+<body>
+<!-- TOP NAVIGATION - EMP -->
+
+<div class="topnav">
+  <a  href="employeeLanding.html"  >Home</a>
+  <a href="employeeCreateRequest.html">Create a Request</a>
+  <a href="employeerequestHistory.html" class="active">Request History</a>
+  <a href="index.html" class="logout">Logout</a>
+</div>
+
+
+<!-- end of top nav -->
+
+<div class="box">
+  <div class="header">
+    <img src="logo.png"  width="150px" height="150px "alt="logo" />
+  </div>
+
+  <!--Header image -->
+  <h1 align="center">Employee Request History</h1>
+  <p align="center"> View your submitted requests, or click <a href="employeeLanding.html">here</a> to access other Employee operations</p>
+  <div id="login_div">
+    <h1 align="center">You are not signed in.</h1>
+    <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+  </div>
+  <div id="user_div">
+      <table>
+    <button id="load" onClick="loadRequests()">Load Your Requests</button>
+    <div id="request">
+      <nav>
+        <ul id="requestList"></ul>
+      </nav>
+      <button id="loadLodgedButton" onClick="loadLodgedRequests()">Load Lodged Requests</button>
+      <select id="lodgedrequest"></select>
+      <button id="deleteRequestBtn" onClick="deleteLodgedRequest()">Cancel Lodged Request</button>
+    </div>
+      </table>
+  </br>
+    </br>
+    </br>
+    </br>
+  </div></div>
+  <img src="footer.png" alt="footer" class="footer">
+
+  <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+      authDomain: "utssupply-stationery.firebaseapp.com",
+      databaseURL: "https://utssupply-stationery.firebaseio.com",
+      projectId: "utssupply-stationery",
+      storageBucket: "",
+      messagingSenderId: "333420959904"
+    };
+    firebase.initializeApp(config);
+  </script>
+  <script>
+    ////////////////////////////////////////////////////
+    ///////////////IS USER SIGNED IN?///////////////////
+    ////////////////////////////////////////////////////
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log(firebase.auth().currentUser);
+        // User is signed in.
+        document.getElementById("user_div").style.display = "block";
+        document.getElementById("user_div").style.display = "center";
+        document.getElementById("login_div").style.display = "none";
+      } else {
+        // No user is signed in.
+        document.getElementById("user_div").style.display = "none";
+        document.getElementById("login_div").style.display = "block";
+      }
+    });
+  </script>
+  <script>
+    /////////////////// global varibles //////////////////////////
+    var fac; //the managers faculty
+    var prod; //the current product in a request
+    var globref;
+    var productUid;
+    var userUid;
+    var amount;
+    var pname;
+    var uname;
+    var requestInAssessment;
+    database = firebase.database();
+    var currentRequest = [];
+    var count = 1;
+    var key;
+    ////////////////////get employee faculty //////////////////////
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        userUid = user.uid;
+        var ref = database.ref('Users/employees');
+        ref.once('value', gotData, errData);
+
+        function gotData(data) {
+          var Users = data.val();
+          var keys = Object.keys(Users);
+          for (var i = 0; i < keys.length; i++) {
+            var k = keys[i];
+            var faculty = Users[k].faculty;
+            if (userUid == k) {
+              fac = faculty;
+            }
+          }
+        }
+
+        function errData(err) {
+          console.log('Error!');
+          console.log(err);
+        }
+      }
+    });
+    ///////////////////////////////////////////////////////////////////
+    ////get the requests for the managers faculty///////////////////////////
+    ///////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////
+    function loadRequests() {
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          userUid = user.uid;
+          console.log(userUid);
+          var ref = database.ref('Users/employees');
+          console.log(ref);
+          ref.once('value', gotData, errData);
+
+          function gotData(data) {
+            //console.log(data.val());
+            var Users = data.val();
+            console.log(Users);
+            var keys = Object.keys(Users);
+            //console.log(keys);
+            for (var i = 0; i < keys.length; i++) {
+              var k = keys[i];
+              console.log(k);
+              var faculty = Users[k].faculty;
+              console.log(faculty);
+              if (userUid == k) {
+                fac = faculty;
+                console.log(fac);
+              }
+            }
+          }
+
+          function errData(err) {
+            console.log('Error!');
+            console.log(err);
+          }
+        }
+      });
+
+      var newRef = database.ref('Requests/' + fac +'/');
+      newRef.once('value', gotData, errData);
+
+      function gotData(data) {
+        var requests = data.val();
+        console.log(requests);
+        var keys = Object.keys(requests);
+        console.log(keys);
+        for (var i = 0; i < keys.length; i++) {
+          var k = keys[i];
+          var uname = requests[k].uname;
+          var status = requests[k].status;
+          var test = (k + ": " + uname);
+          if (status != "lodged") {
+            requestInAssessment = k;
+            pname = requests[k].pname;
+            amount = requests[k].amount;
+            status = requests[k].status;
+            // Find a <table> element with id="myTable":
+            var ul = document.getElementById("requestList");
+            var li = document.createElement("li");
+            li.appendChild(document.createTextNode(pname + " | | " + amount + " | | " + status));
+            ul.appendChild(li);
+            count = count + 1;
+            //    }
+          }
+        }
+      }
+
+      function errData(err) {
+        console.log('Error!');
+        console.log(err);
+      }
+    }
+    /////////////////////load selection list///////////////////////////
+    function loadLodgedRequests() {
+      var newRef = database.ref('Requests/' + fac);
+      newRef.once('value', gotData, errData);
+
+      function gotData(data) {
+        var requests = data.val();
+        console.log(requests);
+        var keys = Object.keys(requests);
+        console.log(keys);
+        console.log("whats going on here");
+        for (var i = 0; i < keys.length; i++) {
+          k = keys[i];
+          var pname = requests[k].pname;
+          var notLodged = requests[k].status;
+          var amount = requests[k].amount;
+          if (notLodged == "lodged") {
+            var select = document.getElementById("lodgedrequest");
+            var option = document.createElement("option");
+            option.appendChild(document.createTextNode(pname + ": " + amount));
+            select.appendChild(option);
+          }
+        }
+      }
+
+      function errData(err) {
+        console.log('Error!');
+        console.log(err);
+      }
+    }
+
+    ////////////////cancel selected requests///////////////////////////
+    /////////////////////cancel selection//////////////////////////////
+    function deleteLodgedRequest() {
+      var fb = firebase.database().ref()
+      var selectionList = document.getElementById("lodgedrequest");
+      var selectedRequest = selectionList.options[selectionList.selectedIndex].value;
+      var newRef = database.ref('Requests/' + fac);
+      newRef.once('value', gotData, errData);
+
+      function gotData(data) {
+        console.log(selectedRequest);
+        var Requests = data.val();
+        var keys = Object.keys(Requests);
+        for (var i = 0; i < keys.length; i++) {
+          var k = keys[i];
+          var pname = Requests[k].pname;
+          var amount = Requests[k].amount;
+          var productUid = Requests[k].productUid;
+          console.log(pname);
+          console.log(amount);
+          console.log(k);
+          var test = (pname + ": " + amount);
+          if(selectedRequest == (pname + ": " + amount)){
+          var pop = window.confirm('Are you sure you want to cancel?');
+          if (pop == true) {
+            returnStock(amount,productUid);
+            newRef.child('/' + k).remove();
+            window.alert('The selected request has been deleted.');
+          }
+        }
+    }
+        location.reload();
+      }
+
+      function errData(err) {
+        console.log('Error!');
+        console.log(err);
+      }
+
+    }
+    
+    function returnStock(amount,productUid) {
+      var returnRef = database.ref("Products/" + productUid);
+      returnRef.once('value', gotData, errData);
+
+      function gotData(data) {
+        var Product = data.val();
+        var amt = Product.inStock;
+        var productName = Product.productName;
+        var productDescription = Product.productDescription;
+        var productCategory = Product.productCategory;
+        var productSupplier = Product.productSupplier;
+        var productPrice = Product.productPrice;
+        var inStock = parseInt(amount) + parseInt(amt);
+        var data = {
+          productName,
+          productDescription,
+          productCategory,
+          productSupplier,
+          productPrice,
+          inStock
+        }
+        console.log(data);
+        const fb = firebase.database().ref();
+        fb.child('Products/' + productUid).set(data);
+      }
+
+      function errData(err) {
+        console.log('Error!');
+        console.log(err);
+      }
+    }
+
+  </script>
+</body>
+
+</html>

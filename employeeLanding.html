@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+<head>
+  <title>UTSupply Stationery</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-database.js"></script>
+  <link rel="stylesheet" href="uts.css">
+</head>
+<style type="text/css">
+
+  table
+</style>
+<body>
+<!-- TOP NAVIGATION - EMP -->
+
+<div class="topnav">
+  <a  href="employeeLanding.html" class="active" >Home</a>
+  <a href="employeeCreateRequest.html">Create a Request</a>
+  <a href="employeeRequestHistory.html">Request History</a>
+  <a href="index.html" class="logout">Logout</a>
+</div>
+
+
+<!-- end of top nav -->
+
+<div class="box" text-align="center">
+  <div class="header">
+    <img src="logo.png"  width="150px" height="150px "alt="logo" />
+  </div>
+  <div id="login_div">
+    <h1 align="center">You are not signed in.</h1>
+    <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+  </div>
+  <div id="user_div">
+    <h1> Welcome, Employee!</h1>
+    <h2>Please select an action from the provided list below:</h2>
+    <form>
+      <table>
+        <button formaction="employeeCreateRequest.html">Create A Stock Request</button>
+        <button formaction="employeeRequestHistory.html">View Request History</button>
+      </table>
+    </form>
+  </div>
+</div>
+  <img src="footer.png" alt="footer" class="footer">
+  <script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+    authDomain: "utssupply-stationery.firebaseapp.com",
+    databaseURL: "https://utssupply-stationery.firebaseio.com",
+    projectId: "utssupply-stationery",
+    storageBucket: "",
+    messagingSenderId: "333420959904"
+  };
+  firebase.initializeApp(config);
+</script>
+  <script>
+    ////////////////////////////////////////////////////
+    ///////////////IS USER SIGNED IN?///////////////////
+    ////////////////////////////////////////////////////
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log(firebase.auth().currentUser);
+        // User is signed in.
+        document.getElementById("user_div").style.display = "block";
+        document.getElementById("user_div").style.display = "center";
+        document.getElementById("login_div").style.display = "none";  
+    }
+       else {
+        // No user is signed in.
+        document.getElementById("user_div").style.display = "none";
+        document.getElementById("login_div").style.display = "block";
+      }
+    });   
+  </script>
+</body>
+
+</html>

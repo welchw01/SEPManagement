@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+<head>
+  <title>Manager Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+  <link rel="stylesheet" href="uts.css" />
+</head>
+<style type="text/css">
+body {
+           text-align: center;
+            background-image: linear-gradient( -135deg, #071628, #1B52AE);
+        }
+
+
+      </style> 
+<body>
+  <div class="box">
+   <div class="header">
+  <img src="logo.png"  width="150px" height="150px "alt="logo" />
+</div>
+<div id="login_div" class="main-div">
+
+    <h1>Manager Login</h1>
+    <h2>Please enter email and password</h2>
+      <table>
+        <tr>
+          <th>
+            <p>Email: </p>
+          </th>
+          <th><input type="text" id="email" name="username" placeholder="enter email here..."></th>
+        </tr>
+        <tr>
+          <th>
+            <p>Password: </p>
+          </th>
+          <th><input type="password" id="password" name="password" placeholder="enter password here..."></th>
+        </tr>
+        <tr>
+          <th><button> <a href="index.html"> Go back </a></button></th>
+          <th><button onclick="login()" id="btn-log-in" type="submit" name="log-in">Log In</button></th>
+        </tr>
+      </table>
+       
+</div>
+    <div id="user_div" class="loggedin-div">
+        <h1>Welcome Manager</h1>
+        <p id="user_para"></p>
+        <p>You are already logged in. Click below to view the access panel:</p>
+        <form>
+                <button formaction="managerLanding.html">Manager Roles</button>
+        </form>
+        <button onclick="logout()">Logout</button>
+    </div>
+    </div>
+
+     <img src="footer.png" alt="footer" class="footer">
+    <script>
+    // Initialize Firebase
+    var config = {
+    apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+    authDomain: "utssupply-stationery.firebaseapp.com",
+    databaseURL: "https://utssupply-stationery.firebaseio.com",
+    projectId: "utssupply-stationery",
+    storageBucket: "",
+    messagingSenderId: "333420959904"
+    };
+      firebase.initializeApp(config);
+    database = firebase.database();
+
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+
+    document.getElementById("user_div").style.display = "block";
+    document.getElementById("user_div").style.align = "center";
+    document.getElementById("login_div").style.display = "none";
+
+    var user = firebase.auth().currentUser;
+
+    if(user != null){
+
+      var email_id = user.email;
+      document.getElementById("user_para").innerHTML = "Welcome Admin : " + email_id;
+
+    }
+
+  } else {
+    // No user is signed in.
+
+    document.getElementById("user_div").style.display = "none";
+    document.getElementById("login_div").style.display = "block";
+
+  }
+  });
+
+  function login(){
+
+  var userEmail = document.getElementById("email").value;
+  var userPass = document.getElementById("password").value;
+  var test = 0;
+  console.log(test);
+  var ref = database.ref('Users/managers');
+  console.log(ref);
+  ref.on('value',gotData, errData);
+
+  function gotData(data){
+    //console.log(data.val());
+    var Users = data.val();
+    console.log(Users);
+    var keys = Object.keys(Users);
+    //console.log(keys);
+    for(var i=0;i < keys.length;i++ ){
+      console.log("currently in for loop: ");
+      console.log("outside if statment variables: ");
+      var k = keys[i];
+      console.log(k);
+      var email = Users[k].email;
+      var password = Users[k].password;
+      console.log(email);
+      if(email == userEmail){
+        test = 1;
+  firebase.auth().signInWithEmailAndPassword(userEmail, userPass).catch(function(error) {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+
+    window.alert("Error : " + errorMessage);
+
+    // ...
+  });
+  }
+  else{}
+  }
+  console.log('i have made it past the gotData function');
+  console.log(test);
+  if(test == 0){
+    console.log('if has been triggered')
+    window.alert('please enter valid manager credentials');
+  }
+  test = 0;
+  }
+  function errData(err){
+    console.log('Error!');
+    console.log(err);
+  }
+  }
+  function logout(){
+  firebase.auth().signOut();
+  }
+</script>
+</body>
+
+</html>

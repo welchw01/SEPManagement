@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>UTSupply Stationery</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="uts.css">
+    </head>
+   
+    <body>
+
+      <!-- TOP NAVIGATION???-->
+
+   <div class="topnav">
+            <a  href="adminLanding.html" class="active">Home</a>
+            <div class="dropdown">
+              <button class="dropbutton">Register </button>
+              <div class="dropdown_content">
+  <a href="adminRegisterEmployee.html" >Register Employee</a>
+   <a href="adminRegisterManager.html">Register Manager</a>
+   </div>
+</div>
+   <div class="dropdown">
+              <button class="dropbutton" >Edit </button>
+              <div class="dropdown_content">
+  <a href="adminEditEmployee.html">Edit Employee</a>
+   <a href="adminEditManager.html">Edit Manager</a>
+   </div>
+</div>
+<div class="dropdown">
+              <button class="dropbutton">Remove </button>
+              <div class="dropdown_content">
+  <a href="adminRemoveEmployee.html">Remove Employee</a>
+   <a href="adminRemoveManager.html">Remove Manager</a> 
+</div>
+</div>
+<a href="adminViewUser.html">View Users</a>
+  <a href="index.html" class="logout">Logout</a>
+</div>
+
+
+<!-- end of top nav -->
+
+ <div class="box">
+     <div class="header">
+  <img src="logo.png"  width="150px" height="150px "alt="logo" />
+</div>
+      <div id="login_div">
+        <h1 align="center">You are not signed in.</h1>
+        <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+      </div>
+      <div id="user_div">
+        <h1>Welcome Administrator</h1>
+        <h2>Please select an administrative operation:</h2>
+        <form>
+        <table>
+          <td>
+          <p>Register Users - </p>
+          <button formaction="adminRegisterEmployee.html">Register new employee</button>
+          <button formaction="adminRegisterManager.html">Register new manager</button>
+        </td>
+        <td></td>
+        <td>
+          <p>Edit Users - </p>
+          <button formaction="adminEditEmployee.html">Edit current employees</button>
+          <button formaction="adminEditManager.html">Edit current managers</button>
+        </td>
+        <td></td>
+        <td>
+          <p>Remove Users - </p>
+          <button formaction="adminRemoveEmployee.html">Remove Employee</button>
+          <button formaction="adminRemoveManager.html">Remove Manager</button>
+        </td>
+        <td>
+          <p>View Users - </p>
+          <button formaction="adminViewUser.html">View User</button>
+</br>
+</br>
+        </td>
+        </table>
+        </form>
+        <form>
+        <button formaction="index.html">Log Out</button>
+      </form>
+    </div>
+  </div>
+   <img src="footer.png" alt="footer" class="footer">
+    <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+    <script>
+    //Initalise Firebase
+    var config = {
+      apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+      authDomain: "utssupply-stationery.firebaseapp.com",
+      databaseURL: "https://utssupply-stationery.firebaseio.com",
+      projectId: "utssupply-stationery",
+      storageBucket: "utssupply-stationery.appspot.com",
+      messagingSenderId: "333420959904"
+    };
+    firebase.initializeApp(config);
+    ////////////////////////////////////////////////////
+    ///////////////IS USER SIGNED IN?///////////////////
+    ////////////////////////////////////////////////////
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log(firebase.auth().currentUser);
+        // User is signed in.
+        document.getElementById("user_div").style.display = "block";
+        document.getElementById("user_div").style.display = "center";
+        document.getElementById("login_div").style.display = "none";
+      } else {
+        // No user is signed in.
+        document.getElementById("user_div").style.display = "none";
+        document.getElementById("login_div").style.display = "block";
+      }
+    });
+  </script>
+    </body>
+</html>

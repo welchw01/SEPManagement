@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+    <head>
+        <title>UTSupply Stationery - Edit Manager</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="uts.css">
+    </head>
+
+    <body>
+
+        <!-- TOP NAVIGATION???-->
+
+        <div class="topnav">
+            <a  href="adminLanding.html">Home</a>
+            <div class="dropdown">
+                <button class="dropbutton">Register </button>
+                <div class="dropdown_content">
+                    <a href="adminRegisterEmployee.html" >Register Employee</a>
+                    <a href="adminRegisterManager.html">Register Manager</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbutton" id="active">Edit </button>
+                <div class="dropdown_content">
+                    <a href="adminEditEmployee.html">Edit Employee</a>
+                    <a href="adminEditManager.html">Edit Manager</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button class="dropbutton">Remove </button>
+                <div class="dropdown_content">
+                    <a href="adminRemoveEmployee.html">Remove Employee</a>
+                    <a href="adminRemoveManager.html">Remove Manager</a>
+
+                </div>
+            </div>
+            <a href="adminViewUser.html">View Users</a>
+            <a href="index.html" class="logout">Logout</a>
+        </div>
+
+        <!-- end of top nav -->
+
+        <div class="box">
+            <div class="header">
+                <img src="logo.png"  width="150px" height="150px "alt="logo" />
+            </div>
+
+            <!--Header image -->
+
+            <div id="login_div">
+                <h1 align="center">You are not signed in.</h1>
+                <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+            </div>
+            <div id="user_div">
+                <h1> Edit Manager</h1>
+                <p> Please select a Manager to edit or return to the Administrator Operations <a href="adminLanding.html">here</a></p>
+                <table>
+                    <div class="selection">
+                        <tr>
+                            <td>
+                                <select id="userList" name="selection"></select>
+                            </td>
+                            <td>
+                                <button id="loadBtn" onclick="loadUser()" type="submit">select Manager</button>
+                            </td>
+                        </tr>
+                        <tr class="spacer"></tr>
+                    </div>
+                    <tr>
+                        <td>Name: </td>
+                        <td><input type="text" id="registerName" name="Name" placeholder="Full Name"></td>
+                    </tr>
+                    <tr>
+                        <td>Faculty: </td>
+                        <td><select id="registerFaculty" name="faculty">
+                                <option value="FEIT">FEIT</option>
+                                <option value="FASS">FASS</option>
+                                <option value="DAB">DAB</option>
+                            </select></td>
+                    </tr>
+                    <tr>
+                        <td>Password: </td>
+                        <td><input type="text" id="registerPassword" name="password" placeholder="Password"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><button onclick="editUser()" type="submit" name="sign-up">Update</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <img src="footer.png" alt="footer" class="footer">
+        <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+        <script>
+                            // Initialize Firebase
+                            var config = {
+                                apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+                                authDomain: "utssupply-stationery.firebaseapp.com",
+                                databaseURL: "https://utssupply-stationery.firebaseio.com",
+                                projectId: "utssupply-stationery",
+                                storageBucket: "",
+                                messagingSenderId: "333420959904"
+                            };
+                            firebase.initializeApp(config);
+
+                            var config = {
+                                apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+                                authDomain: "utssupply-stationery.firebaseapp.com",
+                                databaseURL: "https://utssupply-stationery.firebaseio.com",
+                                projectId: "utssupply-stationery",
+                                storageBucket: "",
+                                messagingSenderId: "333420959904"
+                            };
+                            var secondaryApp = firebase.initializeApp(config, "Secondary");
+        </script>
+        <script>
+             ////////////////////////////////////////////////////
+            ///////////////IS USER SIGNED IN?///////////////////
+            ////////////////////////////////////////////////////
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    console.log(firebase.auth().currentUser);
+                    // User is signed in.
+                    document.getElementById("user_div").style.display = "block";
+                    document.getElementById("user_div").style.display = "center";
+                    document.getElementById("login_div").style.display = "none";
+                } else {
+                    // No user is signed in.
+                    document.getElementById("user_div").style.display = "none";
+                    document.getElementById("login_div").style.display = "block";
+                }
+            });
+            /////////////////////////////////////////////////////
+            /////////////load Selection bar/////////////////////
+            /////////////////////////////////////////////////////
+            database = firebase.database();
+            var ref = database.ref('Users/managers');
+            ref.on('value', gotData, errData);
+
+            function gotData(data) {
+                console.log(data.val());
+                var Users = data.val();
+                var keys = Object.keys(Users);
+                console.log(keys);
+                for (var i = 0; i < keys.length; i++) {
+                    var k = keys[i];
+                    var name = Users[k].email;
+                    console.log(name);
+                    var select = document.getElementById("userList");
+                    var option = document.createElement("option");
+                    option.appendChild(document.createTextNode(name));
+                    select.appendChild(option);
+                    console.log(document.getElementById("userList"));
+                }
+            }
+
+            function errData(err) {
+                console.log('Error!');
+                console.log(err);
+
+            }
+
+
+            /////////////////////////////////////////////////////
+            /////////load Selected User's credentials///////////
+            /////////////////////////////////////////////////////
+            function loadUser() {
+                var fb = firebase.database().ref();
+                var selectionList = document.getElementById("userList");
+                var strUser = selectionList.options[selectionList.selectedIndex].value;
+                console.log(strUser);
+                ref.on('value', gotData, errData);
+
+                function gotData(data) {
+                    //console.log(data.val());
+                    var Users = data.val();
+                    var keys = Object.keys(Users);
+                    //console.log(keys);
+                    for (var i = 0; i < keys.length; i++) {
+                        var k = keys[i];
+                        console.log(k);
+                        var email = Users[k].email;
+                        console.log(email);
+                        if (email == strUser) {
+                            document.getElementById("registerName").value = Users[k].name;
+                            document.getElementById("registerPassword").value = Users[k].password;
+                        } else {
+                        }
+                    }
+                }
+            }
+
+
+            /////////////////////////////////////////////////////
+            /////////////Edit Selected User/////////////////////
+            /////////////////////////////////////////////////////
+            function editUser() {
+                var fb = firebase.database().ref();
+                var selectionList = document.getElementById("userList");
+                var strUser = selectionList.options[selectionList.selectedIndex].value;
+                console.log(selectionList);
+                console.log(strUser);
+                ref.on('value', gotData, errData);
+
+                function gotData(data) {
+                    //console.log(data.val());
+                    var Users = data.val();
+                    var keys = Object.keys(Users);
+                    //console.log(keys);
+                    for (var i = 0; i < keys.length; i++) {
+                        var k = keys[i];
+                        console.log(k);
+                        var email = Users[k].email;
+                        console.log(email);
+                        var password = Users[k].password;
+                        console.log(password);
+                        if (email == strUser) {
+                            console.log('found a matching user');
+                            var namePatt = /^[a-zA-Z ]{1,70}$/;
+                            var test = document.getElementById('registerName').value;
+
+                            if (namePatt.test(test)) {
+                                secondaryApp.auth().signInWithEmailAndPassword(email, password).catch(function (error) {
+                                    // Handle Errors here.
+                                    var errorCode = error.code;
+                                    var errorMessage = error.message;
+                                    // ...
+                                });
+                                console.log('past the signin auth');
+                            } else {
+                                window.alert('please enter a valid name');
+                            }
+                        }
+                    }
+
+                    function errData(err) {
+                        console.log('Error!');
+                        console.log(err);
+                    }
+                }
+
+                secondaryApp.auth().onAuthStateChanged(function (user) {
+                    if (user) {
+                        const fb = firebase.database().ref();
+                        email = user.email;
+                        console.log(email);
+                        password = document.getElementById('registerPassword').value;
+                        console.log(password);
+                        name = document.getElementById('registerName').value;
+                        console.log(name);
+                        faculty = document.getElementById('registerFaculty').value;
+                        console.log(faculty);
+                        data = {
+                            email,
+                            password,
+                            name,
+                            faculty
+                        };
+                        console.log(user);
+                        var uid = user.uid;
+                        user.updatePassword(password).then(function () {
+                            fb.child('Users/managers/' + uid).set(data);
+                            secondaryApp.auth().signOut();
+                            window.alert(email + ' details have been updated');
+                            location.reload();
+                        }).catch(function (error) {
+                            window.alert('Please enter a valid password');
+                        });
+                    } else {
+                        console.log('no one in deletion auth');
+                    }
+                }
+                );
+            }
+        </script>
+    </body>
+
+</html>

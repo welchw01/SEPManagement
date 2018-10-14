@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+<head>
+  <title>Manager Account Registry</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-auth.js"></script>
+  <script>
+    src = "login.js"
+  </script>
+</head>
+
+<body>
+  <div id="login_div">
+    <h1 align="center">You are not signed in.</h1>
+    <h3 align="center"> To sign in, please click <a href="index.html">here</a> to login.</h3>
+  </div>
+  <div id="user_div">
+    <h1>Manager Account Registry</h1>
+
+    <table>
+      <tr>
+        <td>Name</td>
+        <td><input type="text" name="name" placeholder="Full Name"></td>
+      </tr>
+      <!--
+      <tr>
+        <td>Faculty</td>
+        <td><select name="faculty">
+						<option value=""></option>
+						<option value=""></option>
+						<option value=""></option>
+						<option value=""></option>
+						<option value=""></option>
+				    </select></td>
+      </tr>
+    -->
+      <tr>
+        <td>Email </td>
+        <td><input type="text" id="registerEmail" name="email" placeholder="Email"></td>
+      </tr>
+      <tr>
+        <td>Password</td>
+        <td><input type="password" id="registerPassword" name="password" placeholder="Password"></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><button onclick="signUp()" id="btn-log-in" type="submit" name="log-in">Sign Up</button></td>
+      </tr>
+    </table>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyAQk_v7BPeyt97BodhP3TQlGy-c_tnlzEM",
+      authDomain: "utssupply-stationery.firebaseapp.com",
+      databaseURL: "https://utssupply-stationery.firebaseio.com",
+      projectId: "utssupply-stationery",
+      storageBucket: "",
+      messagingSenderId: "333420959904"
+    };
+    firebase.initializeApp(config);
+
+    ////////////////////////////////////////////////////
+    ///////////////IS USER SIGNED IN?///////////////////
+    ////////////////////////////////////////////////////
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log(firebase.auth().currentUser);
+        // User is signed in.
+        document.getElementById("user_div").style.display = "block";
+        document.getElementById("user_div").style.display = "center";
+        document.getElementById("login_div").style.display = "none";
+      } else {
+        // No user is signed in.
+        document.getElementById("user_div").style.display = "none";
+        document.getElementById("login_div").style.display = "block";
+      }
+    });
+  </script>
+
+  <script>
+    function signUp() {
+      var email = document.getElementById('registerEmail').value;
+      var pass = document.getElementById('registerPassword').value;
+
+      firebase.auth().createUserWithEmailAndPassword(email, pass)
+        .catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          if (errorCode == 'auth/weak-password') {
+            alert('The password is too weak.');
+          } else {
+            alert(errorMessage);
+          }
+          console.log(error);
+        });
+    }
+  </script>
+  </form>
+</body>
+
+</html>
